@@ -1,6 +1,5 @@
 use rand::Rng;
 
-
 #[derive(Debug)]
 enum Hand {
     Rock,
@@ -44,15 +43,15 @@ r"
             err => Err(format!("Error: \"{err}\" is not a valid input"))
         }
     }
-    fn won_against<'a>(&'a self, other: &'a Hand) -> (GameResult, &Hand) {
+    fn result_against<'a>(&'a self, other: &'a Hand) -> GameResult {
         match (self, other) {
             (Hand::Rock    , Hand::Scissors) |
             (Hand::Paper   , Hand::Rock    ) |
-            (Hand::Scissors, Hand::Paper   ) => (GameResult::Won, &self),
+            (Hand::Scissors, Hand::Paper   ) => GameResult::Won,
             (Hand::Rock    , Hand::Paper   ) |
             (Hand::Paper   , Hand::Scissors) |
-            (Hand::Scissors, Hand::Rock    ) => (GameResult::Lose, &other),
-            _ => (GameResult::Tie, &self)
+            (Hand::Scissors, Hand::Rock    ) => GameResult::Lose,
+            _ => GameResult::Tie
         }
     }
     fn to_string(&self) -> &'static str {
@@ -82,15 +81,16 @@ fn main() {
         let hand = get_player_hand();
         let other = get_comp_hand();
         println!("{}", concat_blocks(hand.to_string(), other.to_string()));
-        let result = match hand.won_against(&other) {
-            (GameResult::Won, _) => format!("{} WON!! :)", hand.name()),
-            (GameResult::Lose, _) => format!("{} LOSE. :(", hand.name()),
-            (GameResult::Tie, _) => format!("TIE..."),
+        let result = match hand.result_against(&other) {
+            GameResult::Won => format!("{} WON!! :)", hand.name()),
+            GameResult::Lose => format!("{} LOSE. :(", hand.name()),
+            GameResult::Tie => format!("TIE..."),
         };
         println!("{result}\n");
     }
 }
 
+/// displays to blocks of text next to eachother
 fn concat_blocks(block_1: &str, block_2: &str) -> String {
     let mut output = String::new();
     let line_1 = block_1.lines();
